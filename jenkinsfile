@@ -9,7 +9,7 @@ pipeline {
       }
     }
 
-    stage('Cybric Integration Artifact Uploader') {
+    stage('ZeroNorth Integration Artifact Uploader') {
       steps {
         script {
           /* Retrieve the API token from the Credentials Store */
@@ -17,16 +17,11 @@ pipeline {
             cybricApiKey = "${env.CYBRIC_API_KEY}".toString()
           }
 
-          /* Get CYBRIC Docker images */
+          /* Get ZeroNorth Docker images */
           def image = docker.image("cybricio/integration:latest")
           image.pull()
 
-          /* Scan #1: Sonatype NexusIQ scan */
-          image.inside("-v \"${WORKSPACE}/:/results\" -v \"$WORKSPACE:/code\" -e CYBRIC_API_KEY=${cybricApiKey} -e POLICY_ID=H0XLNCHiSKSPQWIUgaJcWQ -e FAIL_ON_HIGH_SEVERITY=critical") {
-            sh "python /app/cybric.py"
-          }
-
-          /* Scan #2: SonarQube scan */
+          /* Scan #1: SonarQube scan */
           image.inside("-v \"${WORKSPACE}/:/results\" -v \"$WORKSPACE:/code\" -e CYBRIC_API_KEY=${cybricApiKey} -e POLICY_ID=JrWch34FQmOlUnUhjI3bnA -e FAIL_ON_HIGH_SEVERITY=high") {
             sh "python /app/cybric.py"
           }
